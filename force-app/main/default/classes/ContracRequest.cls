@@ -11,22 +11,22 @@ global with sharing class ContracRequest {
         RestRequest request = RestContext.request;
             String contractId = request.requestURI.substring(
                 request.requestURI.lastIndexOf('/')+1);
-                Contract thisContract = [SELECT Id, Status, ContractTerm FROM Contract WHERE Id = :contractId];
+                Contract thisContract = [SELECT Id, Status, ContractTerm FROM Contract WHERE Id =: contractId];
             // Deserialize the JSON string into name-value pairs
             //Les champs seront liés a leur valeur en string avec cette map
             Map<String, Object> params = (Map<String, Object>)JSON.deserializeUntyped(request.requestbody.tostring());
             // Iterate through each parameter field and value
             for(String fieldName : params.keySet()) {
                 // Set the field and value on the Case sObject
-                thisContract.put(fieldName, params.get(fieldName));
                 //On assigne la nouvelle valeur au champs
                 if(fieldName == 'Status'){
-                    String StatusField = (String)thisContract.get('Status');
+                    String StatusField = (String)params.get('Status');
                     StatusField = (String)params.get(fieldName);
+                    thisContract.put(fieldName, StatusField);
                 }
                 if(fieldName == 'ContractTerm'){
-                  Integer term = Integer.valueOf((String)thisContract.get('ContractTerm'));
-                 term = Integer.valueOf((String)params.get(fieldName));
+                  Integer term = Integer.valueOf((String)params.get('ContractTerm'));
+                  thisContract.put(fieldName, term);
                 }
             }
             update thisContract;
